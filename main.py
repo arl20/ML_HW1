@@ -23,9 +23,6 @@ import io
 
 app = FastAPI()
 
-COLUMNS = {'name', 'year',  'km_driven', 'fuel', 'seller_type',
-       'transmission', 'owner', 'mileage', 'engine', 'max_power', 'torque',
-       'seats'}
 class Item(BaseModel):
     name: str
     year: int
