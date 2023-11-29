@@ -1,9 +1,41 @@
 # ML_HW1
+В рамках этого домашнего задания была построена модель и реализован сервис на FastApi.
+### Модель линейной регрессии
+Итоговая модель линейной регрессии использовала следующие фичи:
+* _year_2_ - квадрат года
+* _km_driven_log_- логарифм переменной km_driven
+* _max_torque_rpm_log_ - логарифм переменной max_torque
+* _engine_log_ - логарифм переменной engine
+* _model_ - модель автомобиля, полученная с помощью парсинга переменной name (закодированная с помощью OneHotEncoding)
+* _mileage_
+* _max_power_
+* _torque_
+* _fuel, seller_type, transmission, owner, seats_ - закодированные с помощью OneHotEncoding.
+Итоговая модель дала на тестовых данных $R^2=0.93$ и значение бизнес метрики 0.355.
+Наибольший прирост дало логарифмирование целевой переменной, а также информация о модели автомобиля.
 
-![screen_fastapi_predict_items_output](https://github.com/arl20/ML_HW1/assets/150931058/a18a3552-2486-40da-989e-7c7c3e34c5e9)
-![screen_fastapi_predict_items_input](https://github.com/arl20/ML_HW1/assets/150931058/f501d759-390c-473f-8a57-8e00f4ccf63a)
-![screen_fastapi_predict_items](https://github.com/arl20/ML_HW1/assets/150931058/11159904-9fe3-4434-b501-3bfb8e53cf0a)
-![screen_fastapi_predict_item_output](https://github.com/arl20/ML_HW1/assets/150931058/0ddf24fe-5575-4f3b-83f5-c3e782537a30)
-![screen_fastapi_predict_item_input](https://github.com/arl20/ML_HW1/assets/150931058/16077d15-5c01-4363-9cb4-9b0c5b9a5f24)
-![screen_fastapi_docs_preict_item](https://github.com/arl20/ML_HW1/assets/150931058/63220c56-4fcb-4843-85d4-ae94b6902bfb)
+
+### Сервис FastApi
+В сервисе два режима работы: 
+1. На вход в формате json подаются признаки одного объекта, на выходе сервис выдает предсказанную стоимость машины.
+2. На вход подается csv-файл с признаками тестовых объектов, на выходе получаем файл с +1 столбцом - предсказаниями на этих объектах
+
+Для работы сервис использует предварительно обученную модель, а также информацию о тренировочном датасете, на которых эта модель обучалась: состав столбец, обученный StandardScaler, медианы числовых полей.
+Получив на вход новый датасет, сервис предварительно обрабатывает его: заполняет пропуски в числовых полях медианами трейна, делит после torque на поля torque и max_torque_rpm, приводит поля к нужным типам, кодирует категориальные фичи. Затем используется модель из .pickle файла для предсказания. Если во входном датасете было поле selling_price, оно остается, но никак не используется.
+В первом режиме работы сервис выдает предсказание - вещественное число. Во втором режиме сервис выгружает датасет с дополнительным столбцом prediction.
+
+Ниже приведен скрин документации сервиса.
 ![screen_fastapi_docs](https://github.com/arl20/ML_HW1/assets/150931058/7b169a36-b06d-4c9d-8964-93d1ceff5ed9)
+В сервисе два режима работы: 
+1. Первый режим работы:
+![screen_fastapi_docs_preict_item](https://github.com/arl20/ML_HW1/assets/150931058/63220c56-4fcb-4843-85d4-ae94b6902bfb)
+Пример:
+![screen_fastapi_predict_item_input](https://github.com/arl20/ML_HW1/assets/150931058/16077d15-5c01-4363-9cb4-9b0c5b9a5f24)
+Пример результата - предсказание:
+![screen_fastapi_predict_item_output](https://github.com/arl20/ML_HW1/assets/150931058/0ddf24fe-5575-4f3b-83f5-c3e782537a30)
+2. Второй режим работы:
+   ![screen_fastapi_predict_items](https://github.com/arl20/ML_HW1/assets/150931058/11159904-9fe3-4434-b501-3bfb8e53cf0a)
+Ниже пример - загружаем файл csv:
+![screen_fastapi_predict_items_input](https://github.com/arl20/ML_HW1/assets/150931058/f501d759-390c-473f-8a57-8e00f4ccf63a)
+На выходе получаем датасет с новым столбцом, который можем скачать:
+![screen_fastapi_predict_items_output](https://github.com/arl20/ML_HW1/assets/150931058/a18a3552-2486-40da-989e-7c7c3e34c5e9)
